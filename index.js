@@ -355,7 +355,6 @@ class ImageBuffer extends Buffer {
 				let o2 = orient(p1, q1, q2);
 				let o3 = orient(p2, q2, p1);
 				let o4 = orient(p2, q2, q1);
-				if(p2[0] == 30 && p2[1] == 30) console.log(o1, o2, o3, o4);
 				if(o1 != o2 && o3 != o4) return true;
 				if(o1 == 0 && colinear(p1, p2, q1)) return true;
 				if(o2 == 0 && colinear(p1, q2, q1)) return true;
