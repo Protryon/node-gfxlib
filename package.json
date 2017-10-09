@@ -1,6 +1,6 @@
 {
   "name": "gfxlib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An image drawing and rasterizing library written for node.js.",
   "main": "index.js",
   "repository": {
