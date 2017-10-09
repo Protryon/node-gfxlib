@@ -433,9 +433,3 @@ module.exports.RESIZE_MODE = RESIZE_MODE;
 module.exports.Font = Font;
 module.exports.Color = Color;
 module.exports.ImageBuffer = ImageBuffer;
-
-let b = new ImageBuffer(null, null, 100, 100);
-b.fill(new Color(255, 255, 255, 255));
-let f = Font.fromSystem({family: 'Arial'}, 10);
-b.drawStringLeft(10, 40, f, "test\ntest", new Color(255, 0, 0, 255));
-fs.writeFileSync('testout.jpg', b.compress('jpg'));
