@@ -7,6 +7,15 @@
   	"type": "git",
   	"url": "https://github.com/protryon/node-gfxlib"
   },
+  "keywords": [
+  	"graphics",
+  	"gfx",
+  	"draw",
+  	"drawing",
+  	"rasterizing",
+  	"raster",
+  	"strings"
+   ],
   "scripts": {},
   "author": "Maxwell Bruce",
   "license": "MIT",

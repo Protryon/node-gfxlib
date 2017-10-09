@@ -45,26 +45,32 @@ class Font {
 		let ndata = Buffer.alloc(4 * this.face.glyph.bitmap.width * this.face.glyph.bitmap.rows);
 		for(let y = 0; y < this.face.glyph.bitmap.rows; y++) {
 			for(let x = 0; x < this.face.glyph.bitmap.width; x++) {
-				ndata[y * this.face.glyph.bitmap.width * 4 + x * 4] = color.scale(new Color(0, 0, 0, 0), (this.face.glyph.bitmap.buffer[y * this.face.glyph.bitmap.width + x]) / 255).toInt();
+				ndata.writeUInt32LE(color.scale(new Color(0, 0, 0, 0), (this.face.glyph.bitmap.buffer[y * this.face.glyph.bitmap.width + x]) / 255).toInt(), y * this.face.glyph.bitmap.width * 4 + x * 4);
 			}
 		}
 		return {width: this.face.glyph.bitmap.width, horiAdvance: this.face.glyph.metrics.horiAdvance / 64, height: this.face.glyph.bitmap.rows, data: ndata};
 	}
 
 	drawStringLeft(img, x, y, str, color) {
+		let maxHeight = 0;
 		for(let i = 0; i < str.length; i++) {
 			let c = this.getChar(str[i], color);
 			img.drawImage(x, y - c.height, x + c.width, y, new ImageBuffer(null, c.data, c.width, c.height), RESIZE_MODE.TRANSPARENTFILL);
 			x += c.horiAdvance;
+			if(c.height > maxHeight) maxHeight = c.height;
 		}
+		return maxHeight;
 	}
 
 	drawStringRight(img, x, y, str, color) {
+		let maxHeight = 0;
 		for(let i = str.length - 1; i >= 0; i--) {
 			let c = this.getChar(str[i], color);
 			x -= c.horiAdvance;
 			img.drawImage(x, y - c.height, x + c.width, y, new ImageBuffer(null, c.data, c.width, c.height), RESIZE_MODE.TRANSPARENTFILL);
+			if(c.height > maxHeight) maxHeight = c.height;
 		}
+		return maxHeight;
 	}
 }
 
@@ -407,11 +413,19 @@ class ImageBuffer extends Buffer {
 	}
 
 	drawStringLeft(x, y, font, str, color) {
-		font.drawStringLeft(this, x, y, str, color);
+		let strs = str.split('\n');
+		let yo = 0;
+		for(let i = 0; i < strs.length; i++) {
+			yo += font.drawStringLeft(this, x, y + yo, strs[i], color) + font.size / 2;
+		}
 	}
 
 	drawStringRight(x, y, font, str, color) {
-		font.drawStringRight(this, x, y, str, color);
+		let strs = str.split('\n');
+		let yo = 0;
+		for(let i = 0; i < strs.length; i++) {
+			yo += font.drawStringRight(this, x, y + yo, strs[i], color) + font.size / 2;
+		}
 	}
 }
 
@@ -419,3 +433,9 @@ module.exports.RESIZE_MODE = RESIZE_MODE;
 module.exports.Font = Font;
 module.exports.Color = Color;
 module.exports.ImageBuffer = ImageBuffer;
+
+let b = new ImageBuffer(null, null, 100, 100);
+b.fill(new Color(255, 255, 255, 255));
+let f = Font.fromSystem({family: 'Arial'}, 10);
+b.drawStringLeft(10, 40, f, "test\ntest", new Color(255, 0, 0, 255));
+fs.writeFileSync('testout.jpg', b.compress('jpg'));
